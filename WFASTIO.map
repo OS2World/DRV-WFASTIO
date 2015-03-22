@@ -1,0 +1,124 @@
+WATCOM Linker Version 10.0
+Copyright by WATCOM International Corp. 1985, 1994. All rights reserved.
+Created on:       96/10/05 16:22:13
+Executable Image: WFASTIO.sys
+creating an OS/2 16-bit dynamic link library
+
+
+                        +------------+
+                        |   Groups   |
+                        +------------+
+
+Group                           Address              Size
+=====                           =======              ====
+
+DGROUP                          0001:0000            00000116
+
+
+
+                        +--------------+
+                        |   Segments   |
+                        +--------------+
+
+Segment                Class          Group          Address         Size
+=======                =====          =====          =======         ====
+
+_HEADER                DATA           DGROUP         0001:0000       0000001e
+CONST                  DATA           DGROUP         0001:001e       00000000
+CONST2                 DATA           DGROUP         0001:001e       00000002
+_DATA                  DATA           DGROUP         0001:0020       000000f4
+_BSS                   BSS            DGROUP         0001:0114       00000000
+_ENDDS                 ENDDS          DGROUP         0001:0114       00000001
+_INITDATA              INITDATA       DGROUP         0001:0116       00000000
+CONST                  CONST          DGROUP         0001:0116       00000000
+_TEXT                  CODE                          0002:0000       0000016f
+_ENDCS                 CODE                          0002:0170       00000001
+
+
+                        +----------------+
+                        |   Memory Map   |
+                        +----------------+
+
+* = unreferenced symbol
++ = symbol only referenced locally
+
+Address        Symbol
+=======        ======
+
+Module: ..\..\dev\device.lib(device)
+0001:0020      _Dev_Entry
+0001:0024      _Dev_StdEntry
+0001:0028*     _Dev_DbgEntry
+0002:0000*     __wcpp_2_pure_error__
+0002:0000*     __wcpp_2_undef_vfun__
+0001:0114      ___OffFinalDS
+0002:0170      ___OffFinalCS
+Module: ..\..\dev\devmisc.lib(debug)
+0001:002c*     COMStream near cdbg
+0001:0036*     COMStream near ccom1
+0001:0040*     COMStream near ccom2
+Module: init.obj(J:\wfastio\driver\init.c)
+0002:0008      short unsigned near StratInit( RP far * )
+Module: ioctl.obj(J:\wfastio\driver\ioctl.c)
+0002:004a+     short unsigned near StratIOCtl( RP far * )
+Module: strategy.obj(J:\wfastio\driver\strategy.c)
+0002:0078      Strategy_
+0001:00c4+     short unsigned (near * near StratDispatch[])( RP far * )
+Module: remove.obj(J:\wfastio\driver\remove.c)
+0002:00a8      short unsigned near StratRemove( RP far * )
+Module: shutdown.obj(J:\wfastio\driver\shutdown.c)
+0002:00ac      short unsigned near StratShutdown( RP far * )
+Module: error.obj(J:\wfastio\driver\error.c)
+0002:00b0      short unsigned near StratError( RP far * )
+Module: open.obj(J:\wfastio\driver\open.c)
+0002:00b4      short unsigned near StratOpen( RP far * )
+Module: close.obj(J:\wfastio\driver\close.c)
+0002:00bc      short unsigned near StratClose( RP far * )
+Module: read.obj(J:\wfastio\driver\read.c)
+0002:00c0      short unsigned near StratRead( RP far * )
+Module: write.obj(J:\wfastio\driver\write.c)
+0002:00c4      short unsigned near StratWrite( RP far * )
+Module: wdvasm.obj(xfree86)
+0001:0104      _Device_Help
+0001:0108      _io_gdt32
+0002:00c8+     acquire_gdt_
+
+
+                        +----------------------+
+                        |   Imported Symbols   |
+                        +----------------------+
+
+Symbol                              Module
+======                              ======
+
+DOSCASEMAP                          NLS
+DOSPUTMESSAGE                       MSG
+DOSGETMESSAGE                       MSG
+DOSBEEP                             DOSCALLS
+DOSCHGFILEPTR                       DOSCALLS
+DOSCLOSE                            DOSCALLS
+DOSDELETE                           DOSCALLS
+DOSDEVCONFIG                        DOSCALLS
+DOSDEVIOCTL                         DOSCALLS
+DOSFINDCLOSE                        DOSCALLS
+DOSFINDFIRST                        DOSCALLS
+DOSFINDNEXT                         DOSCALLS
+DOSGETENV                           DOSCALLS
+DOSGETHUGESHIFT                     DOSCALLS
+DOSGETMACHINEMODE                   DOSCALLS
+DOSGETVERSION                       DOSCALLS
+DOSOPEN                             DOSCALLS
+DOSQCURDIR                          DOSCALLS
+DOSQCURDISK                         DOSCALLS
+DOSQFILEINFO                        DOSCALLS
+DOSQFILEMODE                        DOSCALLS
+DOSREAD                             DOSCALLS
+DOSWRITE                            DOSCALLS
+
+
+                        +-----------------------+
+                        |   Linker Statistics   |
+                        +-----------------------+
+
+Stack size:  0200 (512.)
+Memory size:  0287 (647.)

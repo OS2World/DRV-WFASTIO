@@ -1,0 +1,15 @@
+name WFASTIO.sys 
+file ..\..\dev\device.lib 
+file ..\..\dev\devmisc.lib 
+file header.obj 
+file init.obj 
+file ioctl.obj 
+file strategy.obj 
+file remove.obj 
+file shutdown.obj 
+file error.obj 
+file open.obj 
+file close.obj 
+file read.obj 
+file write.obj 
+file wdvasm.obj 

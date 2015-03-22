@@ -1,0 +1,324 @@
+
+Module: E:\mbeepdriver\ioctl.c
+Group: 'DGROUP' CONST,CONST2,_DATA,_BSS
+
+Segment: _TEXT  WORD   000001ab bytes  
+
+  /************************************************************************\
+**                                                                      **
+**               OS/2(r) Physical Device Driver Libraries               **
+**                         for Watcom C/C++ 10                          **
+**                                                                      **
+**  COPYRIGHT:                                                          **
+**                                                                      **
+**    (C) Copyright Advanced Gravis Computer Technology Ltd 1994.       **
+**        All Rights Reserved.                                          **
+**                                                                      **
+**  DISCLAIMER OF WARRANTIES:                                           **
+**                                                                      **
+**    The following [enclosed] code is provided to you "AS IS",         **
+**    without warranty of any kind.  You have a royalty-free right to   **
+**    use, modify, reproduce and distribute the following code (and/or  **
+**    any modified version) provided that you agree that Advanced       **
+**    Gravis has no warranty obligations and shall not be liable for    **
+**    any damages arising out of your use of this code, even if they    **
+**    have been advised of the possibility of such damages.  This       **
+**    Copyright statement and Disclaimer of Warranties may not be       **
+**    removed.                                                          **
+**                                                                      **
+\************************************************************************/
+
+
+// IOCtl.c
+//
+// Process device specific I/O commands
+//
+// History:
+//
+// Sep 30, 94  David Bollo    Initial version
+
+
+#include <devhelp.h>
+#include <devdebug.h>
+#include <devtype.h>
+#include <devrp.h>
+
+
+#if defined(DEBUG)
+
+static const char* MSG_IOCTL              = "Watcom Sample Device Driver IOCtl";
+static const char* MSG_CATEGORY           = " Category = ";
+static const char* MSG_FUNCTION           = " Function = ";
+
+#else
+
+#define            MSG_IOCTL              0
+#define            MSG_CATEGORY           0
+#define            MSG_FUNCTION           0
+
+#endif // DEBUG
+
+#define IOCTLCAT  0x92
+
+// Dispatch IOCtl requests received from the Strategy routine
+short data;
+
+void SetData (void);
+#pragma aux SetData = \
+   "mov ax, 500"      \
+   "mov es:[bx+8h], ax" \
+   "ret" ;
+
+WORD16 StratIOCtl(RP FAR* _rp)
+  {
+  RPIOCtl FAR* rp = (RPIOCtl FAR*)_rp;
+  // Print a message to the debug terminal saying which IOCtl we just
+  // received.  Of course, if DEBUG is not defined, then the following
+  // instructions will generate _NO_ code!
+  cdbg << SKELETON;
+ 0000                    short unsigned near StratIOCtl( RP far * ):
+ 0000  53                                push    bx
+ 0001  51                                push    cx
+ 0002  56                                push    si
+ 0003  57                                push    di
+ 0004  0f a0                             push    fs
+ 0006  0f a8                             push    gs
+ 0008  55                                push    bp
+ 0009  89 e5                             mov     bp,sp
+ 000b  83 ec 16                          sub     sp,0016H
+
+ 000e  bb 04 00                          mov     bx,0004H
+ 0011  b9 10 00                          mov     cx,0010H
+ 0014  89 46 fe                          mov     -2H[bp],ax
+ 0017  8e c2                             mov     es,dx
+
+  cdbg << MSG_IOCTL << hex << setw(4);
+ 0019  ba 00 10                          mov     dx,1000H
+ 001c  89 5e ea                          mov     -16H[bp],bx
+ 001f  89 df                             mov     di,bx
+ 0021  89 4e ec                          mov     -14H[bp],cx
+ 0024  89 4e f6                          mov     -0aH[bp],cx
+ 0027  8c d8                             mov     ax,ds
+ 0029  89 16 06 00                       mov     COMStream near cdbg+6H,dx
+ 002d  8a 16 09 00                       mov     dl,COMStream near cdbg+9H
+ 0031  8b 1e 00 00                       mov     bx,char const near * near MSG_IOCTL
+ 0035  f6 c2 10                          test    dl,10H
+ 0038  74 09                             je      L1
+ 003a  8b 16 00 00                       mov     dx,COMStream near cdbg
+ 003e  8e e8                             mov     gs,ax
+ 0040  e8 00 00                          call    ComWriteStr
+ 0043  bb 00 00          L1              mov     bx,offset COMStream near cdbg
+ 0046  8b 46 f6                          mov     ax,-0aH[bp]
+ 0049  89 7f 04                          mov     +4H[bx],di
+ 004c  89 47 02                          mov     +2H[bx],ax
+
+  cdbg << MSG_CATEGORY << rp->Category;
+ 004f  8b 5e fe                          mov     bx,-2H[bp]
+ 0052  8b 16 06 00                       mov     dx,COMStream near cdbg+6H
+ 0056  26 8a 47 0d                       mov     al,es:+0dH[bx]
+ 005a  8b 3e 08 00                       mov     di,COMStream near cdbg+8H
+ 005e  30 e4                             xor     ah,ah
+ 0060  8b 1e 00 00                       mov     bx,char const near * near MSG_CATEGORY
+ 0064  89 46 fc                          mov     -4H[bp],ax
+ 0067  8c d8                             mov     ax,ds
+ 0069  85 fa                             test    dx,di
+ 006b  74 09                             je      L2
+ 006d  8b 16 00 00                       mov     dx,COMStream near cdbg
+ 0071  8e e8                             mov     gs,ax
+ 0073  e8 00 00                          call    ComWriteStr
+ 0076  bb 00 00          L2              mov     bx,offset COMStream near cdbg
+ 0079  8b 46 fc                          mov     ax,-4H[bp]
+ 007c  8b 57 06                          mov     dx,+6H[bx]
+ 007f  8b 4f 08                          mov     cx,+8H[bx]
+ 0082  89 5e f0                          mov     -10H[bp],bx
+ 0085  85 ca                             test    dx,cx
+ 0087  74 35                             je      L4
+ 0089  8b 77 02                          mov     si,+2H[bx]
+ 008c  8b 7f 04                          mov     di,+4H[bx]
+ 008f  83 fe 0a                          cmp     si,000aH
+ 0092  75 1b                             jne     L3
+ 0094  85 c0                             test    ax,ax
+ 0096  7d 17                             jge     L3
+ 0098  b8 2d 00                          mov     ax,002dH
+ 009b  8b 17                             mov     dx,[bx]
+ 009d  e8 00 00                          call    ComWriteChar
+ 00a0  8b 46 fc                          mov     ax,-4H[bp]
+ 00a3  f7 d8                             neg     ax
+ 00a5  83 ff 01                          cmp     di,0001H
+ 00a8  74 14                             je      L4
+ 00aa  85 ff                             test    di,di
+ 00ac  74 01                             je      L3
+ 00ae  4f                                dec     di
+ 00af  8b 5e f0          L3              mov     bx,-10H[bp]
+ 00b2  8b 76 f0                          mov     si,-10H[bp]
+ 00b5  99                                cwd     
+ 00b6  8b 5f 02                          mov     bx,+2H[bx]
+ 00b9  8b 34                             mov     si,[si]
+ 00bb  e8 00 00                          call    ComWrite32
+
+  cdbg << MSG_FUNCTION << rp->Function;
+ 00be  8b 5e fe          L4              mov     bx,-2H[bp]
+ 00c1  8b 16 06 00                       mov     dx,COMStream near cdbg+6H
+ 00c5  26 8a 47 0e                       mov     al,es:+0eH[bx]
+ 00c9  8b 0e 08 00                       mov     cx,COMStream near cdbg+8H
+ 00cd  30 e4                             xor     ah,ah
+ 00cf  8b 1e 00 00                       mov     bx,char const near * near MSG_FUNCTION
+ 00d3  89 46 fa                          mov     -6H[bp],ax
+ 00d6  8c d8                             mov     ax,ds
+ 00d8  85 ca                             test    dx,cx
+ 00da  74 09                             je      L5
+ 00dc  8b 16 00 00                       mov     dx,COMStream near cdbg
+ 00e0  8e e8                             mov     gs,ax
+ 00e2  e8 00 00                          call    ComWriteStr
+ 00e5  bb 00 00          L5              mov     bx,offset COMStream near cdbg
+ 00e8  8b 46 fa                          mov     ax,-6H[bp]
+ 00eb  8b 57 06                          mov     dx,+6H[bx]
+ 00ee  8b 77 08                          mov     si,+8H[bx]
+ 00f1  89 5e f8                          mov     -8H[bp],bx
+ 00f4  85 f2                             test    dx,si
+ 00f6  74 35                             je      L7
+ 00f8  8b 57 02                          mov     dx,+2H[bx]
+ 00fb  8b 7f 04                          mov     di,+4H[bx]
+ 00fe  83 fa 0a                          cmp     dx,000aH
+ 0101  75 1b                             jne     L6
+ 0103  85 c0                             test    ax,ax
+ 0105  7d 17                             jge     L6
+ 0107  b8 2d 00                          mov     ax,002dH
+ 010a  8b 17                             mov     dx,[bx]
+ 010c  e8 00 00                          call    ComWriteChar
+ 010f  8b 46 fa                          mov     ax,-6H[bp]
+ 0112  f7 d8                             neg     ax
+ 0114  83 ff 01                          cmp     di,0001H
+ 0117  74 14                             je      L7
+ 0119  85 ff                             test    di,di
+ 011b  74 01                             je      L6
+ 011d  4f                                dec     di
+ 011e  8b 5e f8          L6              mov     bx,-8H[bp]
+ 0121  8b 76 f8                          mov     si,-8H[bp]
+ 0124  99                                cwd     
+ 0125  8b 5f 02                          mov     bx,+2H[bx]
+ 0128  8b 34                             mov     si,[si]
+ 012a  e8 00 00                          call    ComWrite32
+
+  cdbg << setw() << setb() << endl;
+
+ 012d  be 0a 00          L7              mov     si,000aH
+ 0130  a1 06 00                          mov     ax,COMStream near cdbg+6H
+ 0133  8b 1e 08 00                       mov     bx,COMStream near cdbg+8H
+ 0137  31 ff                             xor     di,di
+ 0139  89 76 ee                          mov     -12H[bp],si
+ 013c  89 7e f2                          mov     -0eH[bp],di
+ 013f  89 3e 04 00                       mov     COMStream near cdbg+4H,di
+ 0143  89 36 02 00                       mov     COMStream near cdbg+2H,si
+ 0147  85 d8                             test    ax,bx
+ 0149  74 14                             je      L8
+ 014b  b8 0d 00                          mov     ax,000dH
+ 014e  8b 16 00 00                       mov     dx,COMStream near cdbg
+ 0152  e8 00 00                          call    ComWriteChar
+ 0155  b8 0a 00                          mov     ax,000aH
+ 0158  8b 16 00 00                       mov     dx,COMStream near cdbg
+ 015c  e8 00 00                          call    ComWriteChar
+
+  if(rp->Category != IOCTLCAT)
+ 015f  8b 5e fe          L8              mov     bx,-2H[bp]
+ 0162  26 8a 47 0d                       mov     al,es:+0dH[bx]
+ 0166  30 e4                             xor     ah,ah
+ 0168  3d 92 00                          cmp     ax,0092H
+ 016b  74 27                             je      L10
+
+     return RPDONE;// | RPERR_COMMAND;
+  switch (rp->Function)
+ 016d  eb 2d                             jmp     L11
+
+     {
+     case 0x01:
+       WORD16 freq;
+       WORD16 FAR* pw16;
+       BYTE FAR *bpP, *bpD;
+
+       pw16 = (WORD16 FAR *) &freq;
+ 016f  8b 7e fe          L9              mov     di,-2H[bp]
+
+       bpP = (BYTE FAR*) rp->ParmPacket;
+       bpD = (BYTE FAR*) rp->DataPacket;
+ 0172  26 8b 5f 0f                       mov     bx,es:+0fH[bx]
+ 0176  26 8e 65 11                       mov     fs,es:+11H[di]
+
+       *pw16 = *bpP;
+//      *((WORD16 *) &freq) = *((BYTE FAR*)rp->ParmPacket);
+ //     freq = 100;
+ 017a  64 8a 07                          mov     al,fs:[bx]
+
+       DosBeep(freq, 500);
+ 017d  50                                push    ax
+ 017e  26 8b 7d 13                       mov     di,es:+13H[di]
+ 0182  68 f4 01                          push    01f4H
+ 0185  89 46 f4                          mov     -0cH[bp],ax
+ 0188  9a 00 00 00 00                    call    far DOSBEEP
+
+       *bpD=*pw16;
+//       *((BYTE FAR*)rp->DataPacket) = *((WORD16 *) &freq);
+ 018d  8a 46 f4                          mov     al,-0cH[bp]
+ 0190  88 05                             mov     [di],al
+
+       break;
+
+     default:
+       break;
+ 0192  eb 08                             jmp     L11
+
+     }
+ 0194  26 8a 47 0e       L10             mov     al,es:+0eH[bx]
+ 0198  3c 01                             cmp     al,01H
+ 019a  74 d3                             je      L9
+
+  return RPDONE; // | RPERR_COMMAND;
+ 019c  b8 00 01          L11             mov     ax,0100H
+
+  }
+ 019f  89 ec                             mov     sp,bp
+ 01a1  5d                                pop     bp
+ 01a2  0f a9                             pop     gs
+ 01a4  0f a1                             pop     fs
+ 01a6  5f                                pop     di
+ 01a7  5e                                pop     si
+ 01a8  59                                pop     cx
+ 01a9  5b                                pop     bx
+ 01aa  c3                                ret     
+
+No disassembly errors
+
+------------------------------------------------------------
+
+Segment: CONST  WORD   0000003c bytes  
+ 0000  57 61 74 63 6f 6d 20 53 L12             - Watcom S
+ 0008  61 6d 70 6c 65 20 44 65                 - ample De
+ 0010  76 69 63 65 20 44 72 69                 - vice Dri
+ 0018  76 65 72 20 49 4f 43 74                 - ver IOCt
+ 0020  6c 00                                   - l.
+ 0022  20 43 61 74 65 67 6f 72 L13             -  Categor
+ 002a  79 20 3d 20 00                          - y = .
+ 002f  20 46 75 6e 63 74 69 6f L14             -  Functio
+ 0037  6e 20 3d 20 00                          - n = .
+
+No disassembly errors
+
+------------------------------------------------------------
+
+Segment: _DATA  WORD   00000006 bytes  
+ 0000                          char const near * near MSG_IOCTL LABEL BYTE
+ 0000  00 00                                   DW      DGROUP:L12
+ 0002                          char const near * near MSG_CATEGORY LABEL BYTE
+ 0002  22 00                                   DW      DGROUP:L13
+ 0004                          char const near * near MSG_FUNCTION LABEL BYTE
+ 0004  2f 00                                   DW      DGROUP:L14
+
+No disassembly errors
+
+------------------------------------------------------------
+
+Segment: _BSS  WORD   00000002 bytes  
+
+No disassembly errors
+
+------------------------------------------------------------

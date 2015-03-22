@@ -1,0 +1,116 @@
+#/************************************************************************\
+#**                                                                      **
+#**               OS/2(r) Physical Device Driver Libraries               **
+#**                         for Watcom C/C++ 10                          **
+#**                                                                      **
+#**  COPYRIGHT:                                                          **
+#**                                                                      **
+#**    (C) Copyright Advanced Gravis Computer Technology Ltd 1994.       **
+#**        All Rights Reserved.                                          **
+#**                                                                      **
+#**  DISCLAIMER OF WARRANTIES:                                           **
+#**                                                                      **
+#**    The following [enclosed] code is provided to you "AS IS",         **
+#**    without warranty of any kind.  You have a royalty-free right to   **
+#**    use, modify, reproduce and distribute the following code (and/or  **
+#**    any modified version) provided that you agree that Advanced       **
+#**    Gravis has no warranty obligations and shall not be liable for    **
+#**    any damages arising out of your use of this code, even if they    **
+#**    have been advised of the possibility of such damages.  This       **
+#**    Copyright statement and Disclaimer of Warranties may not be       **
+#**    removed.                                                          **
+#**                                                                      **
+#\************************************************************************/
+
+
+#===================================================================
+#
+#   Device Library Sample Driver Make File
+#
+#   History:
+#
+#   Sep 30, 1994 David Bollo  Initial version
+#
+#===================================================================
+
+
+
+#===================================================================
+#
+#   Setup the environment properly
+#
+#===================================================================
+INC     = e:\watcom\h;e:\watcom\h\os2;..\..\dev;.\iw
+
+
+
+#===================================================================
+#
+#   Auto-dependency information
+#
+#===================================================================
+.ERASE
+.SUFFIXES:
+.SUFFIXES: .lst .obj .c .asm
+
+DEBUG=1
+CFLAGS  = -d0 -bt=os2 -d1 -e60 -5 -i$(INC) -omerlin -s -wx -xd -ze -zdp -zff -zgf -zl -zq -zu -ms
+CC      = WPP $(CFLAGS)
+
+AFLAGS  = -q 
+ASM     = WASM $(AFLAGS)
+
+DFLAGS  = -l -s
+DIS     = WDISASM $(DFLAGS)
+
+LFLAGS  = system os2 dll option quiet, map, align=512, eliminate
+LINK    = WLINK $(LFLAGS)
+
+BFLAGS  = -s -t -c -b -q -n
+LIB     = WLIB $(BFLAGS)
+
+.obj.lst:
+        $(DIS) $*
+
+.c.obj: .AUTODEPEND
+        $(CC) $*.c
+
+.asm.obj: .AUTODEPEND
+        $(ASM) $*.asm
+
+
+
+#===================================================================
+#
+#   List of source files
+#
+#===================================================================
+FILE0   = ..\..\dev\device.lib ..\..\dev\devmisc.lib
+FILE1   = header.obj init.obj ioctl.obj strategy.obj remove.obj shutdown.obj error.obj open.obj close.obj read.obj write.obj
+FILE2   = wdvasm.obj
+FILE3   =
+FILE4   =
+FILE5   =
+FILE6   =
+FILE7   =
+FILE8   =
+FILE9   =
+FILES   = $(FILE0) $(FILE1) $(FILE2) $(FILE3) $(FILE4) $(FILE5) $(FILE6) $(FILE7) $(FILE8) $(FILE9)
+TARGET  = WFASTIO
+
+
+
+#===================================================================
+#
+#   Specific dependencies
+#
+#===================================================================
+all: $(TARGET).sys
+
+$(TARGET).lnk: makefile
+    @echo name $(TARGET).sys > $(TARGET).lnk
+    @for %f in ($(FILES)) do @echo file %f >> $(TARGET).lnk
+
+$(TARGET).sys: $(TARGET).lnk $(FILES)
+    $(LINK) @$(TARGET).lnk
+

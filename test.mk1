@@ -1,0 +1,24 @@
+!define BLANK ""
+j:\temp\old\example\ioexam.obj : j:\temp\old\example\ioexam.c .AUTODEPEND
+ @j:
+ cd j:\temp\old\example
+ *wcc386 ioexam.c -i=D:\WATCOM\h;D:\WATCOM\h\os2;j:\temp\old;j:\rtd; -w4 -e2&
+5 -zq -otexan -of -ol -ol+ -om -oi -or -oe20 -d1+ -hw -en -mf -5s -bt=os2
+
+j:\temp\old\example\test.exe : j:\temp\old\example\ioexam.obj j:\temp\old\ex&
+ample\wiolib.obj .AUTODEPEND
+ @j:
+ cd j:\temp\old\example
+ @%write test.lk1 NAME test
+ @%append test.lk1 FIL ioexam.obj,wiolib.obj
+ @%append test.lk1 
+!ifneq BLANK ""
+ *wlib -q -n -b test.imp 
+ @%append test.lk1 LIBR test.imp
+!endif
+ *wlink SYS os2v2 op m d all op st=8192 libp e:\temp\old\iolib op maxe=25 op&
+ q op symf @test.lk1
+!ifneq BLANK ""
+ rc -i $[: -i D:\WATCOM\h -i D:\WATCOM\h\os2  test.exe
+!endif
+
